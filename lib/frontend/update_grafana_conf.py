@@ -21,9 +21,11 @@ CONFIG_FILE='/etc/grafana/grafana.ini'
 config = configparser.ConfigParser()
 config.read(CONFIG_FILE)
 
-db_host = os.environ['DB_HOST']
-if not db_host:
-    import socket; db_host = socket.gethostbyname('metricstore')
+try:
+    db_host = os.environ['DB_HOST']
+except KeyError:
+    import socket
+    db_host = socket.gethostbyname('metricstore')
 
 config['database']['type'] =  os.environ['GRAFANA_DB_TYPE']
 config['database']['host'] = "%s:%s" % (db_host,

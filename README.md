@@ -44,22 +44,27 @@ Application flow is explained in detail in the section `APP FLOW` below.
 
 # INSTALLATION
 
-## Option 1: Through Docker Compose
+## Option 1: Through Podman Compose
 
-Prerequisites: [docker-compose](https://docs.docker.com/compose/)
+Prerequisites: [podman-compose](https://docs.docker.com/compose/)
 
-Copy `env.example` to `.env`. Then, run `$ docker-compose up --build -d`
+Copy `env.example` to `.env`. Then, run `$ podman-compose up --build -d`
 
 ##### TIPS:
 
-- docker-compose self-help (from project root folder):
+- Build the buildah's containers
+```
+for f in lib/*/buildit.sh;do buildah unshare $f;done
+```
+
+- podman-compose self-help (from project root folder):
 
 ```
-start: `docker-compose up -d`
-cleanup: `docker-compose rm` or `docker-compose rm --all`
-shutdown: `docker-compose down`
-restart: `docker-compose restart`
-kill: `docker-compose kill`
+start: `podman-compose up -d`
+cleanup: `podman-compose rm` or `podman-compose rm --all`
+shutdown: `podman-compose down`
+restart: `podman-compose restart`
+kill: `podman-compose kill`
 ```
 
 ## Option 2: Through Openshift
@@ -75,7 +80,7 @@ Get your openshift cluster up and running. Refer to [ose-deployment.md](docs/ope
 Once it's up, do this:
 
 ```
-$ kompose convert -f docker-compose.yml  --provider openshift -o openshift/templates/
+$ kompose convert -f podman-compose.yml  --provider openshift -o openshift/templates/
 $ oc create -f openshift/templates/
 ```
 
@@ -105,7 +110,7 @@ $ oc expose svc nginx
 
 Sarjitsu is accessible through Nginx container's URL / IP address.
 
-- If deployed through docker-compose, access the nginx IP.
+- If deployed through podman-compose, access the nginx IP.
 If you've used default settings from `env.example`, the URL should be `http://0.0.0.0:8001/`
 
 - If deployed through openshift, use the exposed nginx route.
@@ -167,7 +172,7 @@ routed your application in that fashion.
   - Grafana > 2.5 and <= 3.0 (containerized version: 3.0.1-1)
   - Postgres == 9.5 (containerized version: 9.5 (dockerhub latest) ..utilizes UPSERT feature introduced in this version)
 
-- Without docker-compose (WARNING: not recommended / supported anymore), a container can be started using the following approach:
+- Without podman-compose (WARNING: not recommended / supported anymore), a container can be started using the following approach:
 
 ```
 docker rm -f elastic_jitsu
@@ -204,8 +209,8 @@ For other Operating Systems, refer below:
 
 - Clone the repo
 - run cp `cp env.example .env`
-- Start the containers with `docker-compose up -d`.
-- Kill the web container `docker-compose kill web` and make sure rest are running `docker-compose ps`
+- Start the containers with `podman-compose up -d`.
+- Kill the web container `podman-compose kill web` and make sure rest are running `podman-compose ps`
 
 Output should be like this:
 ```
@@ -344,8 +349,8 @@ The default GitHub Issues and Pull Requests interface.
 ### Upcoming features
 
 - Statistics about top N devices. Example: CPUs, Disks or Network devices.
-- ~~Options to integrate this within cloud ecosystem.~~ <- Runs on openshift as well as docker-compose.
-- ~~Service Discovery for individual components.~~ <- Covered by Docker-Compose / OSE feature
+- ~~Options to integrate this within cloud ecosystem.~~ <- Runs on openshift as well as podman-compose.
+- ~~Service Discovery for individual components.~~ <- Covered by podman-compose / OSE feature
 - Nested documents support in Grafana (Network, CPU, Disks, ..). Refer to [PR #4694 of grafana](https://github.com/grafana/grafana/pull/4694) for more.
 - Timeshift feature to compare 2 different sa binaries
 

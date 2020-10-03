@@ -126,6 +126,7 @@ if __name__ == '__main__':
     try:
         app.run(host = app.config.get('HOST'),
                 port = app.config.get('PORT'),
-                debug = app.config.get('DEBUG'))
+                debug = True)
+        #app.config.get('DEBUG'))
     except:
         raise

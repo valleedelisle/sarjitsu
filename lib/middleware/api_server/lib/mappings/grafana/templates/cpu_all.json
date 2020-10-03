@@ -48,12 +48,26 @@
         {
           "bucketAggs": [
             {
-              "field": "recorded_on",
-              "id": "2",
+              "fake": true,
+              "field": "ts",
+              "id": "8",
               "settings": {
-                "interval": "auto"
+                "interval": "auto",
+                "min_doc_count": 0,
+                "trimEdges": 0
               },
               "type": "date_histogram"
+            },
+            {
+              "id": "2",
+              "settings": {
+                "nested": {
+                  "path": "cpu-load",
+                  "query": "0",
+                  "term": "cpu-load.cpu"
+                }
+              },
+              "type": "nested"
             }
           ],
           "metrics": [
@@ -101,12 +115,12 @@
             }
           ],
           "refId": "A",
-          "timeField": "recorded_on"
+          "timeField": "ts"
         }
       ],
       "timeFrom": null,
       "timeShift": null,
-      "title": "CPU utilization (ALL)",
+      "title": "CPU utilization (Core %%KEY%%)",
       "tooltip": {
         "shared": true,
         "value_type": "cumulative"

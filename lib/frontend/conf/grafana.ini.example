@@ -4,7 +4,7 @@
 
 [database]
 type = postgres
-host = 172.17.0.2:5432
+host = metricstore:5432
 name = grafana
 user = grafana
 password = sarjitsu123
@@ -42,3 +42,4 @@ password = sarjitsu123
 [event_publisher]
 
 [dashboards.json]
+

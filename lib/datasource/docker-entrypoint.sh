@@ -8,13 +8,20 @@ if [ "${1:0:1}" = '-' ]; then
 fi
 
 update_configs(){
-
+    CONF_FILE=$1
     sed -i "s/#.*network.host:.*/network.host: 0.0.0.0/g" \
-	/etc/elasticsearch/elasticsearch.yml
-
+    $CONF_FILE
     # sed -i -r 's#elasticsearch\$RANDOM#'$ES_CLUSTER_NAME'#g' /etc/elasticsearch/elasticsearch.yml
     sed -i -r "s/#.*cluster.name:.*/cluster.name: elasticsearch$RANDOM/g" \
-	/etc/elasticsearch/elasticsearch.yml
+    $CONF_FILE
+    cat << EOF >> $CONF_FILE
+index.indexing.slowlog.threshold.index.info: 0s
+index.indexing.slowlog.level: info
+index.search.slowlog.threshold.query.info: 0s
+index.search.slowlog.threshold.fetch.info: 0s 
+index.search.slowlog.level: info
+EOF
+
 
 }
 
@@ -34,16 +41,17 @@ if [ "$1" = 'elastic' ]; then
     LOG_DIR=/var/log/elasticsearch
     PID_DIR=/var/run/elasticsearch
 
-    update_configs
+    update_configs $CONF_FILE
 
-    echo '
-    -Des.pidfile='$PID_DIR'/elasticsearch.pid
-    -Des.default.path.home='$ES_HOME'
-    -Des.default.path.logs='$LOG_DIR'
-    -Des.default.path.data='$DATA_DIR'
-    -Des.default.config='$CONF_FILE'
-    -Des.default.path.conf='$CONF_D'
-    ' >> /etc/elasticsearch/jvm.options
+    sed -ri 's/^-Xm(s|x)[0-9]+[a-z]$/-Xm\1'$ES_JVM_HEAP'/' /etc/elasticsearch/jvm.options
+    cat << EOF >> /etc/elasticsearch/jvm.options
+-Des.pidfile='$PID_DIR'/elasticsearch.pid
+-Des.default.path.home='$ES_HOME'
+-Des.default.path.logs='$LOG_DIR'
+-Des.default.path.data='$DATA_DIR'
+-Des.default.config='$CONF_FILE'
+-Des.default.path.conf='$CONF_D'
+EOF
 
     set -- /usr/share/elasticsearch/bin/elasticsearch
     # exec su-exec elasticsearch "$BASH_SOURCE" "$@"

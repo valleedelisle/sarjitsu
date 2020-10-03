@@ -10,6 +10,8 @@ bulk_action_count = 2000
 number_of_shards = 1
 number_of_replicas = 5
 sar_template_version=02
+log_file=sarjitsu_middleware.log
+log_size=10000
 
 [Grafana]
 ds_name = elastic

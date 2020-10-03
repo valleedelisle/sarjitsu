@@ -5,20 +5,18 @@
 # or
 # $ source ./activate_dev_mode
 
-cd ../../
-
-status=$(docker-compose ps | grep Up  | wc -l)
+status=$(podman-compose ps | grep Up  | wc -l)
 
 if [[ $status -gt 6 ]]; then
     echo "Attempting to kill web container.."
-    docker-compose kill web
+    podman-compose stop web
 elif [[ $status -lt 6 ]]; then
     echo "Sarjitsu is not running. Setting up.."
-    docker-compose up -d
-    docker-compose kill web
+    podman-compose up -d
+    podman-compose stop web
 fi
 
-docker-compose ps
+podman-compose ps
 
 cd lib/backend/
 

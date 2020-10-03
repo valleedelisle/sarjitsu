@@ -30,6 +30,12 @@ handler = RotatingFileHandler(app.config.get('LOG_FILENAME'),
 handler.setLevel(logging.DEBUG)
 handler.setFormatter(formatter)
 app.logger.addHandler(handler)
+stdout_handler = logging.StreamHandler(sys.stdout)
+stdout_handler.setLevel(logging.DEBUG)
+stdout_handler.setFormatter(formatter)
+app.logger.addHandler(stdout_handler)
+app.logger.setLevel(logging.DEBUG)
+
 # log = logging.getLogger('werkzeug')
 # log.setLevel(logging.DEBUG)
 # log.addHandler(handler)

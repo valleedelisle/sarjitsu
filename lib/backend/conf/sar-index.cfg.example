@@ -1,5 +1,5 @@
 [ElasticSearch]
-host =
+host = datasource
 port = 9200
 
 [Server]

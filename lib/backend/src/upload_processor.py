@@ -92,6 +92,7 @@ def begin(target, sessionID, form):
     for filename in filename_list:
         nodename, meta, sadf = q[filename]
         result = [filename, sadf, nodename, meta]
+        app.logger.info("Filename: %s SADF: %s NodeName: %s Meta: %s Q: %s" % (filename, sadf, nodename, meta, q))
         if not meta:
             #We have a failure here, let's delete the uploaded files
             try:

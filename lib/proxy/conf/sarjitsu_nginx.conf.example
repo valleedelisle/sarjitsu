@@ -1,12 +1,14 @@
 upstream flask {
-    server %%SERVERENDPOINT%%:8000;
+    server %%SERVERENDPOINT%%:%%SERVERPORT%%;
 }
 
 server {
   listen 8001;
   server_name default_server;
   client_max_body_size 800M;
+  client_body_timeout 1200s;
   charset utf-8;
+  access_log /var/log/nginx/sarjitsu_access.log upstream_time;
 
   # root /opt/sarjitsu/src/app/templates/;
   error_page   500 502 503 504 =200 /static/defeat.jpg;
@@ -28,6 +30,11 @@ server {
   location @app {
     uwsgi_pass flask;
     include uwsgi_params;
+    uwsgi_read_timeout 1200s;
+    uwsgi_send_timeout 1200s;
+    proxy_connect_timeout  600s;
+    proxy_send_timeout  600s;
+    proxy_read_timeout  600s;
     # uwsgi_pass unix:///opt/sarjitsu/src/flaskapp.sock;
     # include uwsgi_params;
   }

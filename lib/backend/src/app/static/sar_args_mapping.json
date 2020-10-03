@@ -9,6 +9,7 @@
 	"memory_util": "r",
 	"memory_page_stats": "R",
 	"network": "n",
+	"net_dev": "i",
 	"swap_util": "S",
 	"cpu_all": "u",
 	"kernel_inode": "v",
@@ -18,7 +19,8 @@
     },
     "multiple": {
 	"power_management": ["m", ["ALL", "CPU", "FAN", "FREQ", "IN", "TEMP", "USB"]],
-	"network": ["n" , ["ALL", "DEV", "EDEV", "NFS", "NFSD", "SOCK",
+    "net_dev": ["i", ["ALL", "DEV", "EDEV"]],
+	"network": ["n" , ["ALL", "NFS", "NFSD", "SOCK",
 			   "IP", "EIP", "ICMP", "EICMP", "TCP",
               		   "ETCP", "UDP", "SOCK6", "IP6", "EIP6",
               		   "ICMP6", "EICMP6", "UDP6"]],

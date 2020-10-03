@@ -146,6 +146,7 @@ class SysStatParse(object):
 
     _int_name_map = { 'int-global': 'interrupts',
                       'int-proc': 'interrupts-processor' }
+    nested_attributes = {'cpu-load': 'cpu', 'cpu-load-all': 'cpu_all', 'disk': 'block_device', 'network': 'net_dev' }
 
     def __init__(self, fname, target_nodename, es, unique_id, md5,
                 idx_prefix, blk_action_count):
@@ -214,6 +215,7 @@ class SysStatParse(object):
         self.duplicates = 0
         self.errors = 0
         self.exceptions = 0
+        self.nested_terms = collections.defaultdict(list)
 
     def _error(self, msg, *args):
         app.logger.error(msg % args)
@@ -430,6 +432,10 @@ class SysStatParse(object):
         assert not (self.curr_element is not None and self.curr_meta_element is not None)
         self.data_stack.append(self.data_buf.strip())
         self.data_buf = ''
+        try:
+            nest_term = self.nested_attributes[self.state]
+        except KeyError:
+            nest_term = None
 
         if self.state == 'int-global':
             if name == 'irq':
@@ -455,6 +461,8 @@ class SysStatParse(object):
         elif self.state in ('cpu-load', 'cpu-load-all'):
             if name == 'cpu':
                 try:
+                    if attrs['number'] not in self.nested_terms[nest_term]:
+                        self.nested_terms[nest_term].append(attrs['number'])
                     attrs['cpu'] = attrs['number']
                 except KeyError:
                     pass
@@ -466,6 +474,8 @@ class SysStatParse(object):
         elif self.state == 'disk':
             if name == 'disk-device':
                 try:
+                    if attrs['dev'] not in self.nested_terms[nest_term]:
+                        self.nested_terms[nest_term].append(attrs['dev'])
                     attrs['disk-device'] = attrs['dev']
                 except KeyError:
                     pass
@@ -478,6 +488,8 @@ class SysStatParse(object):
                             'voltage-input', 'usb-devices', 'filesystems'):
             if self.state == 'filesystems':
                 try:
+                    if attrs['fsname'] not in self.nested_terms[nest_term]:
+                        self.nested_terms[nest_term].append(attrs['fsname'])
                     attrs['filesystem'] = attrs['fsname']
                 except KeyError:
                     pass
@@ -497,6 +509,8 @@ class SysStatParse(object):
                 self.net_device_iface = attrs['iface']
             else:
                 self.curr_element_dict[name] = self._normalize_attrs(attrs)
+            if 'iface' in attrs and attrs['iface'] not in self.nested_terms[nest_term]:
+                self.nested_terms[nest_term].append(attrs['iface'])
         elif self.state in ('io', 'memory', 'kernel', 'hugepages'):
             if not attrs:
                 assert name, "Expected an element name, not: %r" % name
@@ -869,6 +883,7 @@ def call_indexer(file_path=None, _nodename=None, TS_ALL=TS_ALL,
     # Setup XML element parser
     sparse = SysStatParse(fname, target_nodename, es, run_unique_id,
                         run_md5, INDEX_PREFIX, BULK_ACTION_COUNT)
+    app.logger.info("Nested terms returned by SysStatParse: %s" % sparse.nested_terms)
     # Setup XML parser to use our element callback parser
     p = xml.parsers.expat.ParserCreate()
     p.StartElementHandler = sparse.start_element
@@ -900,10 +915,7 @@ def call_indexer(file_path=None, _nodename=None, TS_ALL=TS_ALL,
                                     end - beg))
     if sparse.exceptions + sparse.errors > 0:
         msg = """ERROR(%s) errors encountered during indexing""" % (_NAME_)
-        if sparse.successes + sparse.duplicates != 0:
-            # Only return a total failure if no records were actually indexed
-            # successfully
-            app.logger.error(msg)
-        return (False, '', '')
+        app.logger.error(msg)
+        return (False, '', '', sparse.nested_terms)
 
-    return (True, TS_ALL[0], TS_ALL[-1])
+    return (True, TS_ALL[0], TS_ALL[-1], sparse.nested_terms)

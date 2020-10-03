@@ -6,11 +6,6 @@ log(){
     echo -e "[$(date +'%D %H:%M:%S %Z')] - $*"
 }
 
-# Add as command if needed
-if [ "${1:0:1}" = '-' ]; then
-    set -- backend "$@"
-fi
-
 update_configs(){
   # whoami
     # ls -lh /home/flask
@@ -38,19 +33,17 @@ update_configs(){
     # cp /home/flask/sar-index.cfg.tmp /opt/sarjitsu/conf/sar-index.cfg
 }
 
-if [ "$1" = 'backend' ]; then
-  export USER_ID=$(id -u)
-  export GROUP_ID=$(id -g)
-  envsubst < /passwd.template > /tmp/passwd
-  export LD_PRELOAD=/usr/lib64/libnss_wrapper.so
-  export NSS_WRAPPER_PASSWD=/tmp/passwd
-  export NSS_WRAPPER_GROUP=/etc/group
+export USER_ID=$(id -u)
+export GROUP_ID=$(id -g)
+envsubst < /passwd.template > /tmp/passwd
+export LD_PRELOAD=/usr/lib64/libnss_wrapper.so
+export NSS_WRAPPER_PASSWD=/tmp/passwd
+export NSS_WRAPPER_GROUP=/etc/group
 
-  echo $(id)
+id
 
-  update_configs
-  cd /opt/sarjitsu/src/
-  /usr/bin/uwsgi --ini /opt/sarjitsu/conf/sarjitsu.ini
-fi
+update_configs
+cd /opt/sarjitsu/src/
+/usr/bin/uwsgi --ini /opt/sarjitsu/conf/sarjitsu.ini
 
 exec "$@"

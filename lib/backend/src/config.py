@@ -5,7 +5,7 @@ import os
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
 # Statement for enabling the development environment
-DEBUG = False
+DEBUG = True
 CFG_PATH = "/opt/sarjitsu/conf/sar-index.cfg"
 
 LOG_FILENAME = 'sarjitsu_app.log'
@@ -52,7 +52,7 @@ TEMPLATE_CONFIGURATION = {
 HOST = "0.0.0.0"
 
 # The port to run the application from
-PORT = 8000
+PORT = 8005
 
 # override above options with local configs if needed
 try:

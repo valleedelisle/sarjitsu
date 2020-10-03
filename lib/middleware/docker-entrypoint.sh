@@ -1,16 +1,9 @@
 #!/bin/bash
 
-set -e
-
-
+set -ex
 log(){
   echo -e "[$(date +'%D %H:%M:%S %Z')] - $*"
 }
-
-# Add as command if needed
-if [ "${1:0:1}" = '-' ]; then
-  set -- api_engine "$@"
-fi
 
 update_configs(){
   if [[ ! -z $ES_HOST ]]; then
@@ -47,19 +40,14 @@ update_configs(){
 
 # -a "$(id -u)" = '0'
 
-if [ "$1" = 'api_engine' ]; then
-  export USER_ID=$(id -u)
-  export GROUP_ID=$(id -g)
-  envsubst < /passwd.template > /tmp/passwd
-  export LD_PRELOAD=/usr/lib64/libnss_wrapper.so
-  export NSS_WRAPPER_PASSWD=/tmp/passwd
-  export NSS_WRAPPER_GROUP=/etc/group
-
-  echo $(id)
-  update_configs
-  /scripts/es-metadata-handler
-  cd /opt/api_server
-  /opt/api_server/run.py
-fi
-
-exec "$@"
+#export USER_ID=$(id -u)
+#export GROUP_ID=$(id -g)
+#envsubst < /opt/api_server/passwd.template > /tmp/passwd
+#export LD_PRELOAD=/usr/lib64/libnss_wrapper.so
+#export NSS_WRAPPER_PASSWD=/tmp/passwd
+#export NSS_WRAPPER_GROUP=/etc/group
+id
+update_configs
+/scripts/es-metadata-handler >> /opt/api_server/es-handler.log
+cd /opt/api_server
+/opt/api_server/run.py >> /opt/api_server/run.log

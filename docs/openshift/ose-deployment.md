@@ -68,6 +68,8 @@ oc get pods
 oc get dc,svc,is,pvc
 oc logs datasource-1-build
 
+oc expose svc/nginx
+oc annotate route nginx --overwrite haproxy.router.openshift.io/timeout=1200s
 ```
 
 

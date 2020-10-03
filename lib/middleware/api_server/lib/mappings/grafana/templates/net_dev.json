@@ -1,4 +1,4 @@
-{
+ {
   "collapse": true,
   "editable": true,
   "height": "250px",
@@ -22,7 +22,7 @@
         "threshold2": null,
         "threshold2Color": "rgba(234, 112, 112, 0.22)"
       },
-      "id": 5,
+      "id": 19,
       "legend": {
         "avg": false,
         "current": false,
@@ -62,9 +62,9 @@
               "id": "2",
               "settings": {
                 "nested": {
-                  "path": "disk",
-                  "query": "dev8-0",
-                  "term": "disk.disk-device"
+                  "path": "network.net-dev",
+                  "query": "bond0",
+                  "term": "network.net-dev.iface"
                 }
               },
               "type": "nested"
@@ -72,14 +72,14 @@
           ],
           "metrics": [
             {
-              "field": "disk.avgrq-sz",
+              "field": "network.net-dev.rxkB",
               "id": "1",
               "meta": {},
               "settings": {},
-              "type": "avg"
+              "type": "max"
             }
           ],
-          "query": "",
+          "query": "_metadata.nodename:somehost.localdomain",
           "refId": "A",
           "timeField": "ts"
         },
@@ -100,9 +100,9 @@
               "id": "2",
               "settings": {
                 "nested": {
-                  "path": "disk",
-                  "query": "dev8-0",
-                  "term": "disk.disk-device"
+                  "path": "network.net-dev",
+                  "query": "bond0",
+                  "term": "network.net-dev.iface"
                 }
               },
               "type": "nested"
@@ -110,14 +110,14 @@
           ],
           "metrics": [
             {
-              "field": "disk.rd_sec",
+              "field": "network.net-dev.txkB",
               "id": "1",
               "meta": {},
               "settings": {},
-              "type": "avg"
+              "type": "max"
             }
           ],
-          "query": "disk.disk-device:dev8-16",
+          "query": "_metadata.nodename:somehost.localdomain",
           "refId": "B",
           "timeField": "ts"
         },
@@ -138,9 +138,9 @@
               "id": "2",
               "settings": {
                 "nested": {
-                  "path": "disk",
-                  "query": "dev8-0",
-                  "term": "disk.disk-device"
+                  "path": "network.net-edev",
+                  "query": "bond0",
+                  "term": "network.net-edev.iface"
                 }
               },
               "type": "nested"
@@ -148,14 +148,14 @@
           ],
           "metrics": [
             {
-              "field": "disk.util-percent",
+              "field": "network.net-edev.rxdrop",
               "id": "1",
               "meta": {},
               "settings": {},
-              "type": "avg"
+              "type": "max"
             }
           ],
-          "query": "disk.disk-device:dev8-16",
+          "query": "_metadata.nodename:somehost.localdomain",
           "refId": "C",
           "timeField": "ts"
         },
@@ -176,9 +176,9 @@
               "id": "2",
               "settings": {
                 "nested": {
-                  "path": "disk",
-                  "query": "dev8-0",
-                  "term": "disk.disk-device"
+                  "path": "network.net-edev",
+                  "query": "bond0",
+                  "term": "network.net-edev.iface"
                 }
               },
               "type": "nested"
@@ -186,14 +186,14 @@
           ],
           "metrics": [
             {
-              "field": "disk.svctm",
+              "field": "network.net-edev.txdrop",
               "id": "1",
               "meta": {},
               "settings": {},
-              "type": "avg"
+              "type": "max"
             }
           ],
-          "query": "disk.disk-device:dev8-16",
+          "query": "_metadata.nodename:somehost.localdomain",
           "refId": "D",
           "timeField": "ts"
         },
@@ -214,9 +214,9 @@
               "id": "2",
               "settings": {
                 "nested": {
-                  "path": "disk",
-                  "query": "dev8-0",
-                  "term": "disk.disk-device"
+                  "path": "network.net-edev",
+                  "query": "bond0",
+                  "term": "network.net-edev.iface"
                 }
               },
               "type": "nested"
@@ -224,14 +224,14 @@
           ],
           "metrics": [
             {
-              "field": "disk.avgqu-sz",
+              "field": "network.net-edev.rxerr",
               "id": "1",
               "meta": {},
               "settings": {},
-              "type": "avg"
+              "type": "max"
             }
           ],
-          "query": "disk.disk-device:dev8-16",
+          "query": "_metadata.nodename:somehost.localdomain",
           "refId": "E",
           "timeField": "ts"
         },
@@ -252,9 +252,9 @@
               "id": "2",
               "settings": {
                 "nested": {
-                  "path": "disk",
-                  "query": "dev8-0",
-                  "term": "disk.disk-device"
+                  "path": "network.net-edev",
+                  "query": "bond0",
+                  "term": "network.net-edev.iface"
                 }
               },
               "type": "nested"
@@ -262,91 +262,15 @@
           ],
           "metrics": [
             {
-              "field": "disk.await",
+              "field": "network.net-edev.txerr",
               "id": "1",
               "meta": {},
               "settings": {},
-              "type": "avg"
+              "type": "max"
             }
           ],
-          "query": "disk.disk-device:dev8-16",
+          "query": "_metadata.nodename:somehost.localdomain",
           "refId": "F",
-          "timeField": "ts"
-        },
-        {
-          "bucketAggs": [
-            {
-              "fake": true,
-              "field": "ts",
-              "id": "3",
-              "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
-              },
-              "type": "date_histogram"
-            },
-            {
-              "id": "2",
-              "settings": {
-                "nested": {
-                  "path": "disk",
-                  "query": "dev8-0",
-                  "term": "disk.disk-device"
-                }
-              },
-              "type": "nested"
-            }
-          ],
-          "metrics": [
-            {
-              "field": "disk.wr_sec",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "avg"
-            }
-          ],
-          "query": "disk.disk-device:dev8-16",
-          "refId": "G",
-          "timeField": "ts"
-        },
-        {
-          "bucketAggs": [
-            {
-              "fake": true,
-              "field": "ts",
-              "id": "3",
-              "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
-              },
-              "type": "date_histogram"
-            },
-            {
-              "id": "2",
-              "settings": {
-                "nested": {
-                  "path": "disk",
-                  "query": "dev8-0",
-                  "term": "disk.disk-device"
-                }
-              },
-              "type": "nested"
-            }
-          ],
-          "metrics": [
-            {
-              "field": "disk.tps",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "avg"
-            }
-          ],
-          "query": "disk.disk-device:dev8-16",
-          "refId": "H",
           "timeField": "ts"
         }
       ],
@@ -367,5 +291,5 @@
     }
   ],
   "showTitle": true,
-  "title": "Disks: block device activity"
+  "title": "Network Interfaces"
 }

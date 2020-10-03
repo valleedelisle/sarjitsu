@@ -2,6 +2,7 @@ import os
 import sys
 import requests
 import subprocess
+import traceback
 
 # user mods
 import creation
@@ -63,42 +64,45 @@ def extract(sessionID, target, sa_filename):
     #FIXME: check if call_indexer works everytime. And if it handles errors
     try:
         #FIXME: bad XML ExpatError
-        state, beg, end = index_sar.call_indexer(file_path=SAR_XML_FILEPATH,
-                               _nodename=NODENAME,
-                               cfg_name=app.config.get('CFG_PATH'),
-                               run_unique_id=sessionID,
-                               run_md5=sessionID)
+        state, beg, end, nested_terms = index_sar.call_indexer(file_path=SAR_XML_FILEPATH,
+                                            _nodename=NODENAME,
+                                            cfg_name=app.config.get('CFG_PATH'),
+                                            run_unique_id=sessionID,
+                                            run_md5=sessionID)
         # import pdb; pdb.set_trace()
 
         if state:
             TSTAMPS['grafana_range_begin'] = beg
             TSTAMPS['grafana_range_end'] = end
     except Exception as E:
+        exc_type, exc_value, exc_tb = sys.exc_info()
+        app.logger.error("\n".join(traceback.format_exception(exc_type, exc_value, exc_tb)))
         app.logger.warn(E)
-        app.logger.warn("=====Running alternate ES indexing script======")
-        CMD_INDEXING = ['scripts/vos/analysis/bin/index-sar',
-                        SAR_XML_FILEPATH, NODENAME]
-        app.logger.info('ES indexing cmd: ' + " ".join(CMD_INDEXING))
-        p3 = subprocess.Popen(CMD_INDEXING, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        p3.wait()
-        RESULT_RAW = p3.communicate()
-        RAW_STDOUT = RESULT_RAW[0].decode().splitlines()
-        RAW_STDERR = RESULT_RAW[1].decode()
+        sys.exit(1)
+        #app.logger.warn("=====Running alternate ES indexing script======")
+        #CMD_INDEXING = ['scripts/vos/analysis/bin/index-sar',
+        #                SAR_XML_FILEPATH, NODENAME]
+        #app.logger.info('ES indexing cmd: ' + " ".join(CMD_INDEXING))
+        #p3 = subprocess.Popen(CMD_INDEXING, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        #p3.wait()
+        #RESULT_RAW = p3.communicate()
+        #RAW_STDOUT = RESULT_RAW[0].decode().splitlines()
+        #RAW_STDERR = RESULT_RAW[1].decode()
 
-        if "ConnectionError" in RAW_STDERR:
-            print(RAW_STDERR, file=sys.stderr)
-            return (NODENAME, False, sadf_type_det)
+        #if "ConnectionError" in RAW_STDERR:
+        #    print(RAW_STDERR, file=sys.stderr)
+        #    return (NODENAME, False, sadf_type_det)
 
-        if "ERROR" in RAW_STDERR:
-            # ES indexing failed
-            print(RAW_STDERR, file=sys.stderr)
-            # return (NODENAME, False, sadf_type_det)
+        #if "ERROR" in RAW_STDERR:
+        #    # ES indexing failed
+        #    print(RAW_STDERR, file=sys.stderr)
+        #    # return (NODENAME, False, sadf_type_det)
 
-        TMP = [line for line in RAW_STDOUT if line.startswith('grafana_range')]
-        if TMP:
-            for line in TMP:
-                k,v = line.split(' ')
-                TSTAMPS[k] = v
+        #TMP = [line for line in RAW_STDOUT if line.startswith('grafana_range')]
+        #if TMP:
+        #    for line in TMP:
+        #        k,v = line.split(' ')
+        #        TSTAMPS[k] = v
 
     if TSTAMPS:
         app.logger.info("[ES data ingested] -- %s" % NODENAME);
@@ -106,7 +110,7 @@ def extract(sessionID, target, sa_filename):
         app.logger.info('end: %s' % TSTAMPS['grafana_range_end'])
 
         GRAPHING_OPTIONS = app.cache.hget("sar_args:%s" % sessionID, "fields").decode()
-        creation.dashboard(NODENAME, GRAPHING_OPTIONS, TSTAMPS)
+        creation.dashboard(NODENAME, GRAPHING_OPTIONS, TSTAMPS, nested_terms)
 
         return (NODENAME, TSTAMPS, sadf_type_det)
     else:
