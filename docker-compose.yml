@@ -8,7 +8,7 @@ services:
     build:
       context: lib/metricstore
     env_file: .env
-    image: sarjitsu:metricstore_official
+    image: "${IMAGE_SOURCE}:psql"
     expose:
     - "${DB_PORT}"
     environment:
@@ -31,13 +31,13 @@ services:
         hard: 65536
     privileged: true
     env_file: .env
-    image: sarjitsu:elasticsearch_new
+    image: "${IMAGE_SOURCE}:elasticsearch"
     ports:
     - "${DATASOURCE_PORT_MAPPING}:${ES_PORT}"
 
   frontend:
     env_file: .env
-    image: localhost/sarjitsu/grafana
+    image: "${IMAGE_SOURCE}:grafana"
     ports:
     - "${FRONTEND_PORT_MAPPING}:${GRAFANA_PORT}"
     links:
@@ -49,7 +49,7 @@ services:
 
   middleware:
     env_file: .env
-    image: localhost/sarjitsu/middleware
+    image: "${IMAGE_SOURCE}:middleware"
     ports:
     - "${MIDDLEWARE_PORT_MAPPING}:${MIDDLEWARE_PORT}"
     privileged: true
@@ -63,7 +63,7 @@ services:
   web:
     restart: always
     env_file: .env
-    image: localhost/sarjitsu/backend
+    image: "${IMAGE_SOURCE}:backend"
     ports:
     - "${BACKEND_PORT_MAPPING}:${BACKEND_SERVER_PORT}"
     depends_on:
@@ -81,6 +81,6 @@ services:
 
   nginx:
     restart: always
-    image: localhost/sarjitsu/nginx
+    image: "${IMAGE_SOURCE}:nginx"
     ports:
     - "${PROXY_PORT_MAPPING}:${PROXY_PORT}"
