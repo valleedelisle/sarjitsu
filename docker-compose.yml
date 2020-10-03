@@ -4,9 +4,9 @@ services:
     image: "redis:alpine"
     ports:
     - "${CACHE_PORT}:${CACHE_PORT}"
-  metricstore:
+  psql:
     build:
-      context: lib/metricstore
+      context: lib/psql
     env_file: .env
     image: "${IMAGE_SOURCE}:psql"
     expose:
@@ -18,9 +18,9 @@ services:
     ports:
     - "${METRICSTORE_PORT_MAPPING}:${DB_PORT}"
 
-  datasource:
+  elasticsearch:
     build:
-      context: lib/datasource
+      context: lib/elasticsearch
       args:
         ES_PORT: $ES_PORT
         ES_JVM_HEAP: $ES_JVM_HEAP
@@ -35,17 +35,17 @@ services:
     ports:
     - "${DATASOURCE_PORT_MAPPING}:${ES_PORT}"
 
-  frontend:
+  grafana:
     env_file: .env
     image: "${IMAGE_SOURCE}:grafana"
     ports:
     - "${FRONTEND_PORT_MAPPING}:${GRAFANA_PORT}"
     links:
-     - metricstore
-     - datasource
+     - psql
+     - elasticsearch
     depends_on:
-     - metricstore
-     - datasource
+     - psql
+     - elasticsearch
 
   middleware:
     env_file: .env
@@ -54,28 +54,28 @@ services:
     - "${MIDDLEWARE_PORT_MAPPING}:${MIDDLEWARE_PORT}"
     privileged: true
     depends_on:
-     - datasource
+     - elasticsearch
     links:
-     - datasource
-     - metricstore
-     - frontend
+     - elasticsearch
+     - psql
+     - grafana
 
-  web:
+  backend:
     restart: always
     env_file: .env
     image: "${IMAGE_SOURCE}:backend"
     ports:
     - "${BACKEND_PORT_MAPPING}:${BACKEND_SERVER_PORT}"
     depends_on:
-     - metricstore
-     - datasource
+     - psql
+     - elasticsearch
      - redis
-     - frontend
+     - grafana
      - middleware
     links:
-     - metricstore
-     - datasource
-     - frontend
+     - psql
+     - elasticsearch
+     - grafana
      - middleware
      - redis
 
