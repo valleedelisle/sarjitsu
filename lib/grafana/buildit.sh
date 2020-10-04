@@ -33,4 +33,3 @@ buildah config --env GRAFANA_PATH=$REPO \
                $ctr1
 buildah config --label description="Grafana with nested aggregation support" $ctr1
 buildah config --port ${GRAFANA_PORT} $ctr1
-buildah commit $ctr1 sarjitsu:${CONTAINER_NAME}

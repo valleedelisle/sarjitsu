@@ -23,7 +23,6 @@ services:
       context: lib/elasticsearch
       args:
         ES_PORT: $ES_PORT
-        ES_JVM_HEAP: $ES_JVM_HEAP
     ulimits:
       nproc: 65536
       nofile:

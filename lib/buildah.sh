@@ -7,7 +7,7 @@ function setup_buildah() {
   CONTAINER_NAME=$(echo $DIR | awk -F "/" '{ print $NF; }')
 }
 function clean_and_setup() {
-  podman rmi localhost/sarjitsu:$CONTAINER_NAME | cat
+  podman rmi ${IMAGE_SOURCE}:$CONTAINER_NAME | cat
   buildah rm ${CONTAINER_NAME}-build | cat
   ctr1=$(buildah from --name ${CONTAINER_NAME}-build fedora:$FEDORA_RELEASE)
   mnt=$(buildah mount $ctr1)
@@ -25,3 +25,8 @@ function clean_and_setup() {
   buildah config --label vcs-url="https://github.com/valleedelisle/sarjitsu/" $ctr1
   buildah config --entrypoint "/entrypoint.sh" $ctr1
 }
+function commit_and_push() {
+  buildah commit $ctr1 ${IMAGE_SOURCE}:${CONTAINER_NAME}
+  podman push ${IMAGE_SOURCE}:${CONTAINER_NAME}
+}
+trap commit_and_push EXIT

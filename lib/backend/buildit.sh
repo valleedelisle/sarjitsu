@@ -43,4 +43,3 @@ buildah config \
 
 buildah config --label description="Sarjitsu backend SAR parser" $ctr1
 buildah config --port ${BACKEND_SERVER_PORT} $ctr1
-buildah commit $ctr1 sarjitsu:${CONTAINER_NAME}

@@ -26,4 +26,3 @@ buildah config \
    $ctr1
 
 buildah config --volume='/var/cache/nginx' $ctr1
-buildah commit $ctr1 sarjitsu:${CONTAINER_NAME}

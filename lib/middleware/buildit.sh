@@ -20,7 +20,7 @@ cp -pr api_server/* ${home_dir}/
 touch ${home_dir}/sarjitsu_middleware.log
 cp conf/sar-index.cfg.example ${home_dir}/sar-index.cfg
 buildah run $ctr1 -- sh -c "groupadd flask && useradd -d /opt/api_server -m -s /bin/bash -g flask flask"
-buildah run $ctr1 -- sh -c "chown -R flask /docker-entrypoint.sh && \
+buildah run $ctr1 -- sh -c "chown -R flask /entrypoint.sh && \
                      chmod -R ug+rwX /scripts /opt/api_server && \
                      chown -R flask:root /scripts /opt/api_server"
 
@@ -48,4 +48,3 @@ buildah config \
 
 buildah config --label description="Sarjitsu middleware api with nested aggregate support" $ctr1
 buildah config --port ${MIDDLEWARE_PORT} $ctr1
-buildah commit $ctr1 sarjitsu:${CONTAINER_NAME}
