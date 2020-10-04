@@ -14,15 +14,6 @@ update_configs(){
     # sed -i -r 's#elasticsearch\$RANDOM#'$ES_CLUSTER_NAME'#g' /etc/elasticsearch/elasticsearch.yml
     sed -i -r "s/#.*cluster.name:.*/cluster.name: elasticsearch$RANDOM/g" \
     $CONF_FILE
-    cat << EOF >> $CONF_FILE
-index.indexing.slowlog.threshold.index.info: 0s
-index.indexing.slowlog.level: info
-index.search.slowlog.threshold.query.info: 0s
-index.search.slowlog.threshold.fetch.info: 0s 
-index.search.slowlog.level: info
-EOF
-
-
 }
 
 if [ "$1" = 'elastic' ]; then
