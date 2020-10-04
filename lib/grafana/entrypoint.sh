@@ -5,7 +5,6 @@ set -x
 log(){
   echo -e "[$(date +'%D %H:%M:%S %Z')] - $*"
 }
-log "Running docker-entrypoint.sh"
 if [[ -z $DB_HOST ]]; then
   DB_HOST='metricstore'
   log "DB_HOST set to default - 'metricstore'"

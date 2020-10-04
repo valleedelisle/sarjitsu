@@ -18,7 +18,7 @@ mkdir -p ${mnt}$REPO && git clone --branch nested_agg_query_resurrect https://gi
 mkdir ${mnt}/etc/grafana/ ${mnt}/var/log/grafana ${mnt}/var/lib/grafana
 cp conf/grafana.ini.example ${mnt}/etc/grafana/grafana.ini
 find ${mnt}${REPO}/pkg/ -type f -exec sed -i 's|github.com/grafana/grafana|github.com/valleedelisle/grafana|g' {} \;
-buildah run $ctr1 -- chown -R grafana:grafana /home/grafana /etc/grafana/ /var/log/grafana /var/lib/grafana /docker-entrypoint.sh
+buildah run $ctr1 -- chown -R grafana:grafana /home/grafana /etc/grafana/ /var/log/grafana /var/lib/grafana /entrypoint.sh
 buildah run --user grafana $ctr1 -- sh -c "cd $REPO && go run build.go setup && go run build.go build"
 buildah run $ctr1 -- npm install -g yarn
 buildah run --user grafana $ctr1 -- sh -c "cd $REPO && yarn install --pure-lockfile && npm run build"

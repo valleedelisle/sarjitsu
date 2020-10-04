@@ -32,8 +32,8 @@ RUN chgrp -R 0 /usr/share/elasticsearch /etc/elasticsearch /var/{run,lib,log}/el
   && chmod -R g+rwX /usr/share/elasticsearch /etc/elasticsearch /var/{run,lib,log}/elasticsearch \
   && chown -R elasticsearch:root /usr/share/elasticsearch /etc/elasticsearch /var/{run,lib,log}/elasticsearch /etc/sysconfig/elasticsearch
 
-COPY docker-entrypoint.sh /
-ENTRYPOINT ["/docker-entrypoint.sh"]
+COPY entrypoint.sh /
+ENTRYPOINT ["/entrypoint.sh"]
 
 USER elasticsearch
 
