@@ -17,6 +17,13 @@ Table of Contents
 
 # Sarjitsu
 
+## Fork notes
+This is a fork of [distributed-system-analysis/sarjitsu](https://github.com/distributed-system-analysis/sarjitsu) with support on nested aggregation in the backend and the middleware component.
+
+There's a [pull request](https://github.com/grafana/grafana/pull/7863#issuecomment-387049832) for this feature in grafana but it's been waiting for 4 years now, so I'm not counting on having it merged anytime soon.
+
+## Original README
+
 Sarjitsu ingests a SAR (System Activity Reporter) binary data file (located under `/var/log/sa/`) ..and produces dynamic visualizations based on Grafana. The name is inspired from 'SAR + jistsu', so to speak, unleashing the power of SAR data.
 
 You could also refer to [this blog post on Sarjitsu](http://arcolife.github.io/blog/2016/06/06/sarjitsu-a-project-on-visualizing-your-systems-activity/) to know more about this app and catch glimpses of some screenshots.
@@ -46,7 +53,7 @@ Application flow is explained in detail in the section `APP FLOW` below.
 
 ## Option 1: Through Podman Compose
 
-Prerequisites: [podman-compose](https://docs.docker.com/compose/)
+Prerequisites: [podman-compose](https://github.com/containers/podman-compose)
 
 Copy `env.example` to `.env`. Then, run `$ podman-compose up --build -d`
 
@@ -54,7 +61,7 @@ Copy `env.example` to `.env`. Then, run `$ podman-compose up --build -d`
 
 - Build the buildah's containers
 ```
-for f in lib/*/buildit.sh;do buildah unshare $f;done
+buildah unshare ./build_all.sh
 ```
 
 - podman-compose self-help (from project root folder):
@@ -64,47 +71,7 @@ start: `podman-compose up -d`
 cleanup: `podman-compose rm` or `podman-compose rm --all`
 shutdown: `podman-compose down`
 restart: `podman-compose restart`
-kill: `podman-compose kill`
 ```
-
-## Option 2: Through Openshift
-
-- To deploy on OpenShift, you could use [kompose](https://github.com/kubernetes-incubator/kompose):
-
-### Step 1
-
-Get your openshift cluster up and running. Refer to [ose-deployment.md](docs/openshift/ose-deployment.md)
-
-### Step 2
-
-Once it's up, do this:
-
-```
-$ kompose convert -f podman-compose.yml  --provider openshift -o openshift/templates/
-$ oc create -f openshift/templates/
-```
-
-or this:
-
-```
-$ kompose up --provider openshift
-
-# either of:
-$ oc get pods,svc -o wide
-$ oc get pods -w
-$ oc get pods --show-all=false
-```
-
-### Step 3
-
-Once all the pods are running, do this:
-
-```
-$ oc expose svc nginx
-# optionally, supply --hostname='' ..if a DNS hostname resolution entry is reserved for this application.
-```
-
-# USAGE
 
 ### Through web
 
@@ -164,124 +131,24 @@ routed your application in that fashion.
 
 # NOTES
 
-- Building docker images on first run would take some time, as the images are pulled from dockerhub, customized & built; then packages are installed and so on..
+- Building container images on first run would take some time, as the images are pulled from upstream, customized & built; then packages are installed and so on..
 
 - If you have custom HOST(s) configured, they should match the following versions (for sarjitsu compatibility reasons):
 
   - Elasticsearch < 2.0 and > 1.5 (containerized version: 1.7.3)
-  - Grafana > 2.5 and <= 3.0 (containerized version: 3.0.1-1)
+  - Grafana: We need this [grafana fork](https://github.com/valleedelisle/grafana/tree/nested_agg_query_resurrect) for nested aggregation support.
   - Postgres == 9.5 (containerized version: 9.5 (dockerhub latest) ..utilizes UPSERT feature introduced in this version)
 
 - Without podman-compose (WARNING: not recommended / supported anymore), a container can be started using the following approach:
 
+For containers with `Dockerfile`:
 ```
-docker rm -f elastic_jitsu
-docker build -t sarjitsu_elasticsearch --build-arg ES_PORT=9200 .
-docker run --name elastic_jitsu -p 9601:9200 -d sarjitsu_elasticsearch
-
-## OR single line:
-docker rm -f elastic_jitsu; docker build -t saitsu_elasticsearch --build-arg ES_PORT=9200 . && docker run --name elastic_jitsu -p 9601:9200 -d sarjitsu_elasticsearch
-
-## supply additional args if needed:  -v /sys/fs/cgroup:/sys/fs/cgroup:ro --privileged
-## although there's a new method out there for running containers without systemd. Checkout the links:
-1. https://developers.redhat.com/blog/2016/09/13/running-systemd-in-a-non-privileged-container/
-2. https://github.com/RHsyseng/container-rhel-examples/tree/master/starter-systemd
+podman rm -f elastic_jitsu
+buildah bud -t sarjitsu_elasticsearch --build-arg ES_PORT=9200 .
+podman run --name elastic_jitsu -p 9601:9200 -d sarjitsu_elasticsearch
 ```
 
-To delete the pods / services as well as the openshift cluster itself,  do this:
-
-```
-$ oc delete service,dc,is,bc datasource frontend metricstore middleware nginx redis web
-
-$ kompose down --provider=openshift
-
-$ oc cluster down
-```
-
-# Development
-
-### Setting up development environment for web/backend service
-
-We've included a script that automates following steps `lib/backend/activate_dev_mode`.
-
-But as of now, it only works with Fedora and Ubuntu OS.
-For other Operating Systems, refer below:
-
-- Clone the repo
-- run cp `cp env.example .env`
-- Start the containers with `podman-compose up -d`.
-- Kill the web container `podman-compose kill web` and make sure rest are running `podman-compose ps`
-
-Output should be like this:
-```
-Name                       Command                State             Ports         
--------------------------------------------------------------------------------------------
-sarjitsu_datasource_1    /docker-entrypoint.sh elastic    Up         0.0.0.0:9200->9200/tcp
-sarjitsu_frontend_1      /docker-entrypoint.sh graf ...   Up         0.0.0.0:3000->3000/tcp
-sarjitsu_metricstore_1   container-entrypoint run-p ...   Up         0.0.0.0:5432->5432/tcp
-sarjitsu_middleware_1    /docker-entrypoint.sh api_ ...   Up         0.0.0.0:5000->5000/tcp
-sarjitsu_nginx_1         /docker-entrypoint.sh prox ...   Up         0.0.0.0:8001->8001/tcp
-sarjitsu_redis_1         docker-entrypoint.sh redis ...   Up         0.0.0.0:6379->6379/tcp
-sarjitsu_web_1           /docker-entrypoint.sh backend    Exit 137            
-```
-
-- Next, navigate to ``` sarjitsu/lib/backend/``` and run this:
-
-```sh
-echo '
-[ElasticSearch]
-host = 0.0.0.0
-port = 9200
-
-[Settings]
-index_prefix = sarjitsu
-index_version = 1
-bulk_action_count = 2000
-number_of_shards = 5
-number_of_replicas = 1
-
-[Grafana]
-dashboard_url = http://0.0.0.0:3000
-api_url = http://0.0.0.0:5000/db/create/
-' > conf/sar-index.cfg
-
-echo 'DEBUG = True' > src/config_local.py
-echo 'CFG_PATH = "'$(realpath conf/sar-index.cfg)'"' >> src/config_local.py
-```
-
-- Install following officially supported packages for your OS distribution:
-
-For Ubuntu OS:
-
-```sh
-sudo apt-get install libgpgme11 libgpgme11-dev python3-gpgme python3-dev
-```
-
-For Fedora OS:
-
-```sh
-sudo dnf install python3-devel gpgme-devel gpgme
-```
-- Activate virtualenv for python3 and install `pip` dependencies:
-
-```sh
-virtualenv -p python3 venv
-source venv/bin/activate
-pip install -r requirements.txt
-```
-
-- Run this to connect `redis` hostname: `echo '0.0.0.0 redis' | sudo tee -a /etc/hosts`
-- Run this from `lib/backend`:  
-
-```sh
-export VOS_CONFIG_PATH="$(realpath conf/sar-index.cfg)"
-```
-
-- Run server:
-```sh
-cd src/
-./server.py
-```
+For container migrated to `buildah`, just run the `buildit.sh` script
 
 # APP FLOW
 
@@ -338,7 +205,7 @@ Files generated in RHEL 5 OS (old enough) ..upto the ones generated by the lates
 # Contributions
 
 Please use Github issues list and its features for contributions.
-[Click here](https://github.com/distributed-system-analysis/sarjitsu/issues) list of issues.
+[Click here](https://github.com/valleedelisle/sarjitsu/issues) list of issues.
 If you think there's a bug in sarjitsu, you're welcome to open an issue here on github and
 could submit PRs for the same. Any refactoring suggestions/PRs to the app are also welcome.
 
