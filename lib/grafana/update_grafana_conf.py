@@ -25,7 +25,7 @@ try:
     db_host = os.environ['DB_HOST']
 except KeyError:
     import socket
-    db_host = socket.gethostbyname('metricstore')
+    db_host = socket.gethostbyname('psql')
 
 config['database']['type'] =  os.environ['GRAFANA_DB_TYPE']
 config['database']['host'] = "%s:%s" % (db_host,

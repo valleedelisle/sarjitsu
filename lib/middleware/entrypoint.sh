@@ -9,7 +9,7 @@ update_configs(){
   if [[ ! -z $ES_HOST ]]; then
     sed -i -r 's#^host\s?=.*#host = '$ES_HOST'#g' /opt/api_server/sar-index.cfg
   else
-    sed -i -r 's#^host\s?=.*#host = datasource#g' /opt/api_server/sar-index.cfg
+    sed -i -r 's#^host\s?=.*#host = elasticsearch#g' /opt/api_server/sar-index.cfg
   fi
 
   sed -i -r 's#^port\s?=.*#port = '$ES_PORT'#g' /opt/api_server/sar-index.cfg
@@ -28,7 +28,7 @@ update_configs(){
   if [[ ! -z $DB_HOST ]]; then
     sed -i -r 's#^db_host\s?=.*#db_host = '$DB_HOST'#g' /opt/api_server/sar-index.cfg
   else
-    sed -i -r 's#^db_host\s?=.*#db_host = metricstore#g' /opt/api_server/sar-index.cfg
+    sed -i -r 's#^db_host\s?=.*#db_host = psql#g' /opt/api_server/sar-index.cfg
   fi
   sed -i -r 's#^db_name\s?=.*#db_name = '$DB_NAME'#g' /opt/api_server/sar-index.cfg
   sed -i -r 's#^db_user\s?=.*#db_user = '$DB_USER'#g' /opt/api_server/sar-index.cfg

@@ -1,9 +1,9 @@
 [ElasticSearch]
-host = datasource
+host = elasticsearch
 port = 9200
 
 [Server]
-host = datasource
+host = elasticsearch
 port = 9200
 
 [Settings]

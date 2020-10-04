@@ -6,8 +6,8 @@ log(){
   echo -e "[$(date +'%D %H:%M:%S %Z')] - $*"
 }
 if [[ -z $DB_HOST ]]; then
-  DB_HOST='metricstore'
-  log "DB_HOST set to default - 'metricstore'"
+  DB_HOST='psql'
+  log "DB_HOST set to default - 'psql'"
 fi
 log "Checking http://$DB_HOST:$DB_PORT"
 while :; do

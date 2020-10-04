@@ -14,7 +14,7 @@ update_configs(){
     if [[ ! -z $ES_HOST ]]; then
 	sed -i -r 's#^host\s?=.*#host = '$ES_HOST'#g' /opt/sarjitsu/conf/sar-index.cfg
     else
-	sed -i -r 's#^host\s?=.*#host = datasource#g' /opt/sarjitsu/conf/sar-index.cfg
+	sed -i -r 's#^host\s?=.*#host = eslasticsearch#g' /opt/sarjitsu/conf/sar-index.cfg
     fi
     sed -i -r 's#^port\s?=.*#port = '$ES_PORT'#g' /opt/sarjitsu/conf/sar-index.cfg
 

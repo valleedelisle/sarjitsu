@@ -66,7 +66,7 @@ def uploader():
 
         dashboard_url = config.get('Grafana','dashboard_url')
         if not dashboard_url:
-            import socket; IP = socket.gethostbyname('frontend')
+            import socket; IP = socket.gethostbyname('grafana')
             dashboard_url = "http://%s:3000" % IP
 
         if form.data['cmd_mode']:
