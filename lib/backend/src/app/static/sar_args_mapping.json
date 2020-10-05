@@ -10,6 +10,7 @@
 	"memory_page_stats": "R",
 	"network": "n",
 	"net_dev": "i",
+    "interrupts": "I",
 	"swap_util": "S",
 	"cpu_all": "u",
 	"kernel_inode": "v",

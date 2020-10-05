@@ -48,12 +48,26 @@
         {
           "bucketAggs": [
             {
-              "field": "recorded_on",
-              "id": "2",
+              "fake": true,
+              "field": "ts",
+              "id": "3",
               "settings": {
-                "interval": "auto"
+                "interval": "auto",
+                "min_doc_count": 0,
+                "trimEdges": 0
               },
               "type": "date_histogram"
+            },
+            {
+              "id": "2",
+              "settings": {
+                "nested": {
+                  "path": "interrupts",
+                  "query": "sum",
+                  "term": "interrupts.intr"
+                }
+              },
+              "type": "nested"
             }
           ],
           "metrics": [
@@ -62,16 +76,16 @@
               "id": "1",
               "meta": {},
               "settings": {},
-              "type": "sum"
+              "type": "max"
             }
           ],
           "refId": "A",
-          "timeField": "recorded_on"
+          "timeField": "ts"
         }
       ],
       "timeFrom": null,
       "timeShift": null,
-      "title": "interrupts",
+      "title": "interrupts (sum)",
       "tooltip": {
         "shared": true,
         "value_type": "cumulative"

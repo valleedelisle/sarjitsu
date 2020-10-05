@@ -52,7 +52,7 @@ class PrepareDashboard(object):
         self.db_credentials = db_credentials
         self.nested_terms = json.loads(nested_terms)
         self.panel_id = 100
-        self.not_nested = { 'network': True }
+        self.nested_limit = { 'interrupts': 'sum' }
         if app:
             self.log = app.logger
         self.log.info("Preparing dashboard for node %s TEMPLATES %s nested_terms %s" % (NODENAME, TEMPLATES, nested_terms))
@@ -101,6 +101,11 @@ class PrepareDashboard(object):
             panel_list = []
             self.log.info("create_Row: Field %s is nested" % field_name)
             for f in self.nested_terms[field_name]:
+                if field_name in self.nested_limit and f not in self.nested_limit[field_name]:
+                    self.log.info("Field %s is limited to graphing only %s: Skipping %s" % (field_name, self.nested_limit[field_name], f))
+                    continue
+                elif field_name in self.nested_limit:
+                    self.log.info("Field %s is limited to graphing only %s: Preparing %s" % (field_name, self.nested_limit[field_name], f))
                 new_panels = copy.deepcopy(template_panel)
                 for panel in new_panels:
                     panel_list.append(self.set_panel(panel, field_name, f))

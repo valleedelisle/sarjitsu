@@ -146,7 +146,7 @@ class SysStatParse(object):
 
     _int_name_map = { 'int-global': 'interrupts',
                       'int-proc': 'interrupts-processor' }
-    nested_attributes = {'cpu-load': 'cpu', 'cpu-load-all': 'cpu_all', 'disk': 'block_device', 'network': 'net_dev' }
+    nested_attributes = {'cpu-load': 'cpu', 'cpu-load-all': 'cpu_all', 'disk': 'block_device', 'network': 'net_dev', 'int-global': 'interrupts' }
 
     def __init__(self, fname, target_nodename, es, unique_id, md5,
                 idx_prefix, blk_action_count):
@@ -439,6 +439,8 @@ class SysStatParse(object):
 
         if self.state == 'int-global':
             if name == 'irq':
+                if attrs['intr'] not in self.nested_terms[nest_term]:
+                    self.nested_terms[nest_term].append(attrs['intr'])
                 if attrs['value'] != "0.00":
                     self.curr_element_dict.append(self._normalize_attrs(attrs))
             else:
