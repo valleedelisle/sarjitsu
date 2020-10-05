@@ -18,6 +18,8 @@ password = sarjitsu123
 [users]
 
 [auth.anonymous]
+enabled = true
+org_role = Admin
 
 [auth.github]
 
