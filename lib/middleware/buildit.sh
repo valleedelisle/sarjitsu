@@ -11,7 +11,6 @@ clean_and_setup
 
 home_dir=${mnt}/opt/api_server
 buildah run $ctr1 -- dnf -y install initscripts python3-pip postgresql-devel gcc redhat-rpm-config python3-devel
-buildah run $ctr1 -- dnf clean all
 cp -p conf/requirements.txt ${mnt}/root/requirements.txt
 buildah run $ctr1 -- pip3 install --no-cache-dir -r /root/requirements.txt
 mkdir -p ${mnt}/scripts $home_dir
@@ -24,7 +23,6 @@ buildah run $ctr1 -- sh -c "chown -R flask /entrypoint.sh && \
                      chmod -R ug+rwX /scripts /opt/api_server && \
                      chown -R flask:root /scripts /opt/api_server"
 
-buildah unmount $ctr1
 buildah config --user flask $ctr1
 buildah config \
    --env ES_HOST=${ES_HOST} \

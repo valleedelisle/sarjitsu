@@ -21,12 +21,12 @@ while :; do
     cd $GRAFANA_PATH
     log "Updating grafana config"
     python3 /update_grafana_conf.py
-    source ./packaging/rpm/sysconfig/grafana-server
-    log "Starting ${GRAFANA_PATH}/bin/grafana-server"
-    ${GRAFANA_PATH}/bin/grafana-server \
+    source ${GRAFANA_PATH}/sysconfig-grafana-server
+    log "Starting ${GRAFANA_PATH}/grafana-server"
+    ${GRAFANA_PATH}/grafana-server \
                 -config ${CONF_FILE} \
-                -pidfile ${PID_FILE} \
                 -homepath $GRAFANA_PATH \
+                cfg:default.log.mode="console" \
                 cfg:default.paths.logs=${LOG_DIR} \
                 cfg:default.paths.data=${DATA_DIR} \
                 cfg:default.paths.plugins=${PLUGINS_DIR}

@@ -9,7 +9,6 @@ source ${root_dir}/lib/buildah.sh
 setup_buildah $0
 clean_and_setup
 buildah run $ctr1 -- dnf -y install git tar bzip2 redis python3-devel gcc
-buildah run $ctr1 -- dnf clean all
 buildah run $ctr1 -- sh -c 'useradd -ms /bin/bash flask && mkdir -p /opt/sarjitsu/conf '
 cp conf/sarjitsu.ini.example ${mnt}/opt/sarjitsu/conf/sarjitsu.ini
 cp conf/sar-index.cfg.example ${mnt}/opt/sarjitsu/conf/sar-index.cfg
@@ -21,7 +20,6 @@ buildah run $ctr1 -- sh -c 'chgrp -R 0 /opt/sarjitsu/ \
   && chmod -R a+rwX /opt/sarjitsu/'
 rm -f ${mnt}/opt/sarjitsu/src/config_local.py
 
-buildah unmount $ctr1
 buildah config --workingdir /opt/sarjitsu/src $ctr1
 buildah config --user flask $ctr1
 buildah config \
