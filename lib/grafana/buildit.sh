@@ -19,6 +19,7 @@ cp conf/grafana.ini.example ${mnt}/etc/grafana/grafana.ini
 cp update_grafana_conf.py ${mnt}/
 find ${mnt}${REPO}/pkg/ -type f -exec sed -i 's|github.com/grafana/grafana|github.com/valleedelisle/grafana|g' {} \;
 buildah run $ctr1 -- chown -R grafana:grafana /update_grafana_conf.py /home/grafana /etc/grafana/ /var/log/grafana /var/lib/grafana /entrypoint.sh
+buildah run $ctr1 -- pip3 install requests
 buildah run --user grafana $ctr1 -- sh -c "cd $REPO && go run build.go setup && go run build.go build && go clean -r"
 buildah run $ctr1 -- npm install -g yarn
 buildah run --user grafana $ctr1 -- sh -c "cd $REPO && yarn install --pure-lockfile && npm run build"

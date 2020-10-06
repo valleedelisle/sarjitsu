@@ -20,7 +20,8 @@ while :; do
     log "connection etablished - [postgres]"
     cd $GRAFANA_PATH
     log "Updating grafana config"
-    python3 /update_grafana_conf.py
+    nohup python3 /update_grafana_conf.py &
+    sleep 3
     source ${GRAFANA_PATH}/sysconfig-grafana-server
     log "Starting ${GRAFANA_PATH}/grafana-server"
     ${GRAFANA_PATH}/grafana-server \
