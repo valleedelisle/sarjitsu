@@ -13,19 +13,20 @@ function clean_and_setup() {
   mnt=$(buildah mount $ctr1)
   buildah run $ctr1 -- sh -c 'echo -e "fastestmirror=1\ndeltarpm=1\n" | tee -a /etc/dnf/dnf.conf'
   buildah run $ctr1 -- dnf update -y
-  buildah run $ctr1 -- dnf install -y vim bind-utils bash-completion iproute procps iputils net-tools nss_wrapper gettext
+  buildah run $ctr1 -- dnf install -y procps iputils net-tools nss_wrapper gettext
   cp conf/passwd.template entrypoint.sh ${mnt}/
   buildah config --author='David Vallee Delisle' $ctr1
   buildah config --label maintainer="David Vallee Delisle <dvd@redhat.com>" $ctr1
   buildah config --label original_author="Archit Sharma <archit.py@gmail.com>" $ctr1
   buildah config --label build_date="$(date +%F)" $ctr1
   buildah config --label name="sarjitsu-${CONTAINER_NAME}" $ctr1
-  buildah config --label description="Sarjitsu ${CONTAINER_NAME}" $ctr1
   buildah config --label vendor="DVD.DEV" $ctr1
   buildah config --label vcs-url="https://github.com/valleedelisle/sarjitsu/" $ctr1
   buildah config --entrypoint "/entrypoint.sh" $ctr1
 }
 function commit_and_push() {
+  buildah run $ctr1 -- dnf clean all
+  buildah unmount $ctr1
   buildah commit $ctr1 ${IMAGE_SOURCE}:${CONTAINER_NAME}
   podman push ${IMAGE_SOURCE}:${CONTAINER_NAME}
 }
