@@ -6,12 +6,9 @@
   <div align="center" class="row">
 
     {% if valid_results %}
-    <div class="progress progress-striped active">
-      <div class="progress-bar" style="width: {{progress}}%"></div>
-    </div>
     <div class="alert alert-dismissible alert-success">
       <p>Go to <a href="{{ redirect_url }}">this Grafana URL</a> to find
-        the visualization dashboard for your data. User/password is admin/admin.
+        the visualization dashboard for your data. 
       </p>
     </div>
     {% endif %}
